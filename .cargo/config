@@ -3,6 +3,7 @@ target = "mikado_riscv32.json"
 
 [target.mikado_riscv32]
 rustflags = [
+  "-C", "opt-level=1",
   "-C", "linker=riscv64-unknown-elf-gcc",
   "-C", "link-arg=-Wl,-march=rv32imac",
   "-C", "link-arg=-Wl,-melf32lriscv",

@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Ben Brittain <ben@brittain.org>"]
 edition = "2018"
 
+[profile.dev]
+debug-assertions = false
+overflow-checks = false
+
 [build-dependencies]
 cc = "1.0.37"
 
