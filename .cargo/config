@@ -12,3 +12,6 @@ rustflags = [
   "-C", "code-model=medium",
   "-C", "relocation-model=static",
 ]
+
+[target.'cfg(target_os = "none")']
+runner = "qemu-system-riscv32  -nographic -machine virt -kernel"
