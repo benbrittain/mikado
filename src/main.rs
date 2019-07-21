@@ -2,6 +2,7 @@
 #![no_main]
 #![feature(asm)]
 
+mod riscv;
 mod trap;
 mod uart;
 
@@ -45,8 +46,7 @@ pub fn main() -> Result<(), core::fmt::Error> {
     uart::initialize();
     println!("Coming back to where you started is not the same as never leaving.\n");
 
-    let result: u32;
-    unsafe { asm!("csrr $0, $1" : "=r"(result) : "i"(0x301)) }
+    let result = riscv::csr::misa();
     println!("result: {:x}", result);
 
     unsafe { asm!("ebreak") }
