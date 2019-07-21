@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use core::ptr;
+use core::{ptr, fmt};
 
 /// NS16550A UART Constants
 
@@ -34,7 +34,7 @@ const UART_LSR_RE: u8   = 0x20; // THR is empty
 const UART_LSR_RI: u8   = 0x40; // THR is empty and line is idle
 const UART_LSR_EF: u8   = 0x80; // Erroneous data in FIFO
 
-#[no_mangle]
+/// Setup the memory required to initialize the UART
 pub fn initialize() {
     unsafe {
         ptr::write_volatile(NS16550A_UART.offset(UART_LCR as isize), UART_LCR_DLAB);
@@ -44,10 +44,37 @@ pub fn initialize() {
     }
 }
 
-#[no_mangle]
-pub fn putchar(ch: u8) {
+/// Write a single character
+fn putchar(ch: u8) {
     unsafe {
-        while ptr::read_volatile(NS16550A_UART.offset(UART_LSR as isize)) & UART_LSR_RI == 0 { }
-        ptr::write_volatile(NS16550A_UART, ch)
+        while (ptr::read_volatile(NS16550A_UART.offset(UART_LSR as isize)) & UART_LSR_RI) == 0 { }
+        ptr::write_volatile(NS16550A_UART, ch & 0xff)
     }
+}
+
+// TODO(bwb): Writer logic belongs elsewhere
+pub struct Writer;
+
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        for byte in s.bytes() {
+            putchar(byte);
+        }
+        Ok(())
+    }
+}
+
+
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ({
+        use core::fmt::Write;
+        crate::uart::Writer.write_fmt(format_args!($($arg)*)).unwrap();
+    });
+}
+
+#[macro_export]
+macro_rules! println {
+    ($fmt:expr) => (print!(concat!($fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
 }

@@ -11,16 +11,16 @@ pub extern fn abort() {
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
     loop {}
 }
+
 
 #[no_mangle]
 pub extern "C" fn _rust_start() -> ! {
     uart::initialize();
-    for b in "Coming back to where you started is not the same as never leaving.\n".bytes() {
-        uart::putchar(b);
-    }
+    println!("Coming back to where you started is not the same as never leaving.");
 
     loop {}
 }
