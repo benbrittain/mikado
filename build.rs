@@ -9,7 +9,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         .compiler("riscv64-linux-gnu-gcc")
         .flag("-march=rv32imac")
         .flag("-mabi=ilp32")
-        .file("src/asm.s").compile("asm");
+        .file("src/asm.s")
+        .compile("asm");
 
     // Rebuild if non-rust files are changed
     println!("cargo:rerun-if-changed=src/asm.s");

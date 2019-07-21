@@ -6,7 +6,7 @@ mod uart;
 use core::panic::PanicInfo;
 
 #[no_mangle]
-pub extern fn abort() {
+pub extern "C" fn abort() {
     panic!("abort!");
 }
 
@@ -16,7 +16,6 @@ fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
-
 #[no_mangle]
 pub extern "C" fn _rust_start() -> ! {
     uart::initialize();
@@ -24,4 +23,3 @@ pub extern "C" fn _rust_start() -> ! {
 
     loop {}
 }
-
