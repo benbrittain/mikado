@@ -1,0 +1,16 @@
+{
+  "llvm-target": "riscv32",
+  "data-layout": "e-m:e-p:32:32-i64:64-n32-S128",
+  "arch": "riscv32",
+  "target-endian": "little",
+  "target-pointer-width": "32",
+  "target-c-int-width": "32",
+  "os": "none",
+  "executables": true,
+  "linker-flavor": "ld.lld",
+  "linker": "rust-lld",
+  "cpu": "generic-rv32",
+  "features": "+m,+a,+c",
+  "panic-strategy": "abort"
+}
+

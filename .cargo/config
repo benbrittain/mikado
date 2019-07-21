@@ -1,0 +1,14 @@
+[build]
+target = "mikado_riscv32.json"
+
+[target.mikado_riscv32]
+rustflags = [
+  "-C", "linker=riscv64-unknown-elf-gcc",
+  "-C", "link-arg=-Wl,-march=rv32imac",
+  "-C", "link-arg=-Wl,-melf32lriscv",
+  "-C", "link-arg=-Wl,--no-relax",
+  "-C", "link-arg=-nostartfiles",
+  "-C", "link-arg=-Tsrc/linker.ld",
+  "-C", "code-model=medium",
+  "-C", "relocation-model=static",
+]
