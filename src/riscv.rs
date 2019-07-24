@@ -91,9 +91,11 @@ pub mod csr {
     ///
     /// When a trap is taken into M-mode, mepc is written with the virtual address of
     /// the instruction that was interrupted or that encountered the exception.
-    pub fn write_mepc(value: usize) {
+    ///
+    /// No guarantee the virtual address is valid, so unsafe
+    pub unsafe fn write_mepc(value: usize) {
         // TODO(bwb): use write_csr
-        unsafe { asm!("csrw $0, $1" :: "i"(Register::Mepc), "r"(value)) }
+        asm!("csrw $0, $1" :: "i"(Register::Mepc), "r"(value))
     }
 
     // READS BELOW

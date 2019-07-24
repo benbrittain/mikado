@@ -10,5 +10,7 @@ pub fn m_trap_handler(registers: *mut usize, mcause: usize, mepc: usize) {
 
     // `m_trap_vector` calls this function. It ends with a `mret`.
     // `mepc` needs to be incremented so the trap handling can make progress
-    csr::write_mepc(mepc + 4);
+    unsafe {
+        csr::write_mepc(mepc + 4);
+    }
 }
