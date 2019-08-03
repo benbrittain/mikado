@@ -12,3 +12,6 @@ overflow-checks = false
 cc = "1.0.37"
 
 [dependencies]
+bitfield = { path = "src/bitfield" }
+bitfield-impl = { path = "src/bitfield/impl" }
+# failure = "*"
