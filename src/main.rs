@@ -2,10 +2,13 @@
 #![no_main]
 #![feature(asm)]
 
+mod clint;
+mod memory_region;
 mod riscv;
 mod trap;
 mod uart;
 
+use clint::Clint;
 use core::panic::PanicInfo;
 
 #[macro_export]
@@ -39,19 +42,37 @@ pub extern "C" fn _rust_start() -> ! {
     if let Err(error) = main() {
         panic!("{}", error);
     }
-    loop {}
+    loop {
+        riscv::wfi()
+    }
 }
 
 pub fn main() -> Result<(), core::fmt::Error> {
     uart::initialize();
     println!("Coming back to where you started is not the same as never leaving.\n");
 
-    let result = riscv::csr::misa();
+    let result = riscv::misa();
     println!("result: {:x}", result);
 
     unsafe { asm!("ebreak") }
 
     println!("Passed breakpoint.");
+
+    write_csr!(0xC80, 0x01);
+
+    println!("{:?}", riscv::mstatus());
+
+    riscv::set_mie(true, true, true);
+    riscv::enable_mie();
+
+    println!("{:?}", riscv::mstatus());
+
+    let mut clint = Clint::new();
+    println!("time: {:?}", clint.set_time_cmp(200));
+    println!("time: {:?}", clint.get_time_cmp());
+    println!("time: {:?}", clint.get_time());
+    println!("time: {:?}", clint.get_time());
+    println!("time: {:?}", clint.get_time());
 
     Ok(())
 }
