@@ -20,6 +20,7 @@ impl Index<u32> for MemoryRegion {
     type Output = usize;
     fn index(&self, index: u32) -> &usize {
         assert_eq!(index as usize % mem::size_of::<usize>() as usize, 0);
+        assert!((index as usize) < self.length_bytes);
         unsafe { &*(self.ptr.add(index as usize / mem::size_of::<usize>())) }
     }
 }
@@ -27,6 +28,13 @@ impl Index<u32> for MemoryRegion {
 impl IndexMut<u32> for MemoryRegion {
     fn index_mut(&mut self, index: u32) -> &mut usize {
         assert_eq!(index % mem::size_of::<usize>() as u32, 0);
+        assert!((index as usize) < self.length_bytes);
         unsafe { &mut *(self.ptr.add(index as usize / mem::size_of::<usize>())) }
     }
+}
+
+#[test_case]
+fn blah() {
+    assert_eq!(2, 4)
+
 }
