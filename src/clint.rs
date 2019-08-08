@@ -1,4 +1,7 @@
+//! Core-Local Interruptor
+
 use crate::memory_region::MemoryRegion;
+use crate::{print, println};
 
 pub struct Clint {
     memory: MemoryRegion,
@@ -22,4 +25,11 @@ impl Clint {
     pub fn get_time(&self) -> usize {
         self.memory[0xbff8]
     }
+}
+
+#[test_case]
+fn blah() {
+    print!("Clint creation... ");
+    let clint = Clint::new();
+    println!("[ok]");
 }

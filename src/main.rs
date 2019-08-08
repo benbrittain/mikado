@@ -1,15 +1,23 @@
 #![no_std]
 #![no_main]
 #![feature(asm)]
+#![feature(custom_test_frameworks)]
+#![test_runner(crate::test_harness::runner)]
+#![reexport_test_harness_main = "test_main"]
 
 mod clint;
 mod memory_region;
+mod plic;
 mod riscv;
 mod trap;
 mod uart;
 
+#[cfg(test)]
+mod test_harness;
+
 use clint::Clint;
 use core::panic::PanicInfo;
+use plic::Plic;
 
 #[macro_export]
 macro_rules! print {
@@ -30,6 +38,7 @@ pub extern "C" fn abort() {
     panic!("abort!");
 }
 
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
@@ -42,6 +51,7 @@ pub extern "C" fn _rust_start() -> ! {
     if let Err(error) = main() {
         panic!("{}", error);
     }
+    println!("\nfinished main\n");
     loop {
         riscv::wfi()
     }
@@ -50,6 +60,11 @@ pub extern "C" fn _rust_start() -> ! {
 pub fn main() -> Result<(), core::fmt::Error> {
     uart::initialize();
     println!("Coming back to where you started is not the same as never leaving.\n");
+    #[cfg(test)]
+    {
+        test_main();
+        return Ok(());
+    }
 
     let result = riscv::misa();
     println!("result: {:x}", result);
@@ -67,6 +82,7 @@ pub fn main() -> Result<(), core::fmt::Error> {
 
     println!("{:?}", riscv::mstatus());
 
+    let mut plic = Plic::new();
     let mut clint = Clint::new();
     println!("time: {:?}", clint.set_time_cmp(200));
     println!("time: {:?}", clint.get_time_cmp());
