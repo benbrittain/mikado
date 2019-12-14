@@ -6,7 +6,6 @@
 ///
 /// Creative Commons Attribution 4.0 International License.
 use core::convert::TryInto;
-//use crate::println;
 
 /// The Wait for Interrupt instruction (WFI) provides a hint to the implementation that the current
 /// hart can be stalled until an interrupt might need servicing. Execution of the WFI instruction

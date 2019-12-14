@@ -1,3 +1,4 @@
+use crate::{print, println};
 use core::mem;
 use core::ops::{Index, IndexMut};
 
@@ -31,10 +32,4 @@ impl IndexMut<u32> for MemoryRegion {
         assert!((index as usize) < self.length_bytes);
         unsafe { &mut *(self.ptr.add(index as usize / mem::size_of::<usize>())) }
     }
-}
-
-#[test_case]
-fn blah() {
-    assert_eq!(2, 4)
-
 }
