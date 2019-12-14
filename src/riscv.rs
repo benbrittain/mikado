@@ -17,6 +17,8 @@ pub fn wfi() {
     }
 }
 
+
+
 #[repr(u16)]
 #[allow(dead_code)]
 pub enum Register {
@@ -83,7 +85,14 @@ pub enum Register {
     Pmpaddr15 = 0x3BF,
 }
 
-// WRITES BELOW
+/// Coerce Register into u16.
+/// This is a workaround for https://github.com/rust-lang/rust/issues/42974
+/// TODO: remove need for this macro and consume enum directly
+macro_rules! reg {
+    ( $reg:expr ) => {
+        $reg as u16
+    }
+}
 
 /// Write to an arbitrary Control and Status Register
 ///
@@ -105,7 +114,7 @@ macro_rules! write_csr {
 ///
 /// No guarantee the virtual address is valid, so unsafe
 pub unsafe fn write_mepc(value: usize) {
-    write_csr!(Register::Mepc, value);
+    write_csr!(reg!(Register::Mepc), value);
 }
 
 /// Read from an arbitrary Control and Status Register
@@ -123,14 +132,14 @@ macro_rules! read_csr {
 /// The misa CSR is a WARL read-write register reporting the ISA supported by the hart.
 pub fn misa() -> usize {
     let result;
-    unsafe { asm!("csrr $0, $1" : "=r"(result) : "i"(Register::Misa)) }
+    unsafe { asm!("csrr $0, $1" : "=r"(result) : "i"(reg!(Register::Misa))) }
     result
 }
 
 /// The mcycle CSR counts the number of clock cycles executed by the processor core on which the hart is running.
 pub fn mcycle() -> usize {
     let result;
-    unsafe { asm!("csrr $0, $1" : "=r"(result) : "i"(Register::Mcycle)) }
+    unsafe { asm!("csrr $0, $1" : "=r"(result) : "i"(reg!(Register::Mcycle))) }
     result
 }
 
@@ -138,7 +147,7 @@ use bitfield::*;
 
 pub fn enable_mie() {
     let value: usize = 1 << 3;
-    write_csr!(Register::Mstatus, value);
+    write_csr!(reg!(Register::Mstatus), value);
 }
 
 pub fn set_mie(msie: bool, mtie: bool, meie: bool) {
@@ -152,12 +161,12 @@ pub fn set_mie(msie: bool, mtie: bool, meie: bool) {
     if meie {
         value += 1 << 11;
     }
-    write_csr!(Register::Mie, value);
+    write_csr!(reg!(Register::Mie), value);
 }
 
 pub fn mstatus() -> MStatus {
     let result: u32;
-    unsafe { asm!("csrr $0, $1" : "=r"(result) : "i"(Register::Mstatus)) }
+    unsafe { asm!("csrr $0, $1" : "=r"(result) : "i"(reg!(Register::Mstatus))) }
     let mut status = MStatus::new();
     // TODO fill in other parts of mstatus. ONLY MIE implemented currentl
     status.set_mie((result == (1 << 3)) as u8);
